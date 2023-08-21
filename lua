@@ -1,61 +1,49 @@
-local isNoclipEnabled = false
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local torso = character:WaitForChild("HumanoidRootPart")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local Plr = Players.LocalPlayer
+local Clipon = false
+local Stepped
 
-local function EnableNoclip()
-    for _, part in ipairs(character:GetDescendants()) do
-        if part:IsA("BasePart") and part.CanCollide then
-            part.CanCollide = false
-        end
-    end
-
-    local noclipConnection
-    noclipConnection = game:GetService("RunService").Stepped:Connect(function()
-        for _, part in ipairs(character:GetDescendants()) do
-            if part:IsA("BasePart") and part.CanCollide then
-                part.CanCollide = false
-            end
-        end
-    end)
-
-    local touchedConnection
-    touchedConnection = torso.Touched:Connect(function(part)
-        if part.CanCollide and not part:FindFirstAncestorWhichIsA("Humanoid") then
-            local originalTransparency = part.Transparency
-            part.CanCollide = false
-            part.Transparency = (part.Transparency <= 0.5) and 0.6 or part.Transparency
-            part.CanCollide = true
-            part.Transparency = originalTransparency
-        end
-    end)
-
-    return {noclipConnection, touchedConnection}
-end
-
-local function DisableNoclip(connections)
-    for _, connection in ipairs(connections) do
-        connection:Disconnect()
-    end
-end
-
-local toggleKey = Enum.KeyCode.N -- Change this to your desired key
-
-local connections = {}
-
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and input.KeyCode == toggleKey then
-        if isNoclipEnabled then
-            DisableNoclip(connections)
-            connections = {}
-            for _, part in ipairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
+local function ToggleNoclip()
+    if not Clipon then
+        Clipon = true
+        Stepped = game:GetService("RunService").Stepped:Connect(function()
+            for _, b in pairs(game.Workspace:GetChildren()) do
+                if b.Name == Plr.Name then
+                    for _, v in pairs(b:GetChildren()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = false
+                        end
+                    end
                 end
             end
-        else
-            connections = EnableNoclip()
+        end)
+    else
+        Clipon = false
+        if Stepped then
+            Stepped:Disconnect()
+            for _, b in pairs(game.Workspace:GetChildren()) do
+                if b.Name == Plr.Name then
+                    for _, v in pairs(b:GetChildren()) do
+                        if v:IsA("BasePart") then
+                            v.CanCollide = true
+                        end
+                    end
+                end
+            end
         end
-        isNoclipEnabled = not isNoclipEnabled
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent then
+        if input.KeyCode == Enum.KeyCode.N then
+            ToggleNoclip()
+        end
     end
 end)
+
+-- Set initial state to off
+Clipon = false
+
+print("Noclip is off")
