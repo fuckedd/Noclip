@@ -25,7 +25,6 @@ local function EnableNoclip()
             local originalTransparency = part.Transparency
             part.CanCollide = false
             part.Transparency = (part.Transparency <= 0.5) and 0.6 or part.Transparency
-            wait(2)
             part.CanCollide = true
             part.Transparency = originalTransparency
         end
@@ -49,6 +48,11 @@ game:GetService("UserInputService").InputBegan:Connect(function(input, gameProce
         if isNoclipEnabled then
             DisableNoclip(connections)
             connections = {}
+            for _, part in ipairs(character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
         else
             connections = EnableNoclip()
         end
