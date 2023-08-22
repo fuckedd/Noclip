@@ -37,7 +37,7 @@ end
 
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if not gameProcessedEvent then
-        if input.KeyCode == Enum.KeyCode.F then
+        if input.KeyCode == Enum.KeyCode.T then
             local textBoxFocused = UserInputService:GetFocusedTextBox()
             if not textBoxFocused then
                 ToggleNoclip()
