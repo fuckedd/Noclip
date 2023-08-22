@@ -2,12 +2,12 @@ local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local Plr = Players.LocalPlayer
 local Clipon = false
-local Stepped
+local SteppedConnection
 
 local function ToggleNoclip()
     if not Clipon then
         Clipon = true
-        Stepped = game:GetService("RunService").Stepped:Connect(function()
+        SteppedConnection = game:GetService("RunService").Stepped:Connect(function()
             for _, b in pairs(game.Workspace:GetChildren()) do
                 if b.Name == Plr.Name then
                     for _, v in pairs(b:GetChildren()) do
@@ -20,8 +20,8 @@ local function ToggleNoclip()
         end)
     else
         Clipon = false
-        if Stepped then
-            Stepped:Disconnect()
+        if SteppedConnection then
+            SteppedConnection:Disconnect()
             for _, b in pairs(game.Workspace:GetChildren()) do
                 if b.Name == Plr.Name then
                     for _, v in pairs(b:GetChildren()) do
@@ -38,7 +38,10 @@ end
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if not gameProcessedEvent then
         if input.KeyCode == Enum.KeyCode.N then
-            ToggleNoclip()
+            local textBoxFocused = UserInputService:GetFocusedTextBox()
+            if not textBoxFocused then
+                ToggleNoclip()
+            end
         end
     end
 end)
